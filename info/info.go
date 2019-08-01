@@ -60,7 +60,8 @@ func (i *Info) Uptime() string {
 	uphours := upminutes/60
 	updays := uphours/24
 	uphours = uphours%24
-	ret := fmt.Sprintf("%d/%d/%d/%d",updays, uphours, upminutes, upseconds)
+	upminutes = upminutes % 60
+	ret := fmt.Sprintf("%ddays %d:%d:%d",updays, uphours, upminutes, upseconds)
 	return ret
 }
 
