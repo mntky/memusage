@@ -17,6 +17,8 @@ func (i *Info) MemTotal() int {
 func (i *Info) MemFree() int {
 	return i.info(1)
 }
+func (i *Info) Available() int {
+	return i.info(2)
 
 func (i *Info) info(num int) int {
 	var lines []int
