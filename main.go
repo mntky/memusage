@@ -16,8 +16,12 @@ func clear() {
 }
 
 func title() {
+	name, err := os.Hostname()
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Printf("\033[37m+----------------------+\n")
-	fmt.Printf("\033[37m|       HostInfo       |\n")
+	fmt.Printf("\033[37m|%s|\n", name)
 	fmt.Printf("\033[37m+----------------------+\n")
 }
 
