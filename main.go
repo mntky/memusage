@@ -5,6 +5,7 @@ import (
 	"time"
 	"os/exec"
 	"os"
+	"bufio"
 
 	"./info"
 )
@@ -15,14 +16,16 @@ func clear() {
 	cmd.Run()
 }
 
-func title() {
-	name, err := os.Hostname()
-	if err != nil {
-		fmt.Println(err)
+func title(hostname string) {
+	i := 0
+	var line string
+	for i < len(hostname) {
+		line += "-"
+		i += 1
 	}
-	fmt.Printf("\033[37m+----------------------+\n")
-	fmt.Printf("\033[37m|%s|\n", name)
-	fmt.Printf("\033[37m+----------------------+\n")
+	fmt.Printf("\033[37m+%s+\n",line)
+	fmt.Printf("\033[37m|%s|\n", hostname)
+	fmt.Printf("\033[37m+%s+\n",line)
 }
 
 func graph(total,free int) string {
@@ -40,7 +43,38 @@ func graph(total,free int) string {
 	return grp
 }
 
+func cont() {
+	var lines []string
+	file, err := os.Open("/var/snap/lxd/common/lxd/containers/definite-muskox/rootfs/tmp/info")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	line := bufio.NewScanner(file)
+	for line.Scan() {
+		lines = append(lines, line.Text())
+	}
+	title(lines[0])
+	fmt.Printf("\033[32m[Uptime]\033[39m%s",lines[1])
+	fmt.Printf("\033[1E")
+	fmt.Printf("\033[32m[MemTotal]\033[39m:	%s mB",lines[2])
+	fmt.Printf("\033[1E")
+	fmt.Printf("\033[32m[MemFree]\033[39m:	%s mB",lines[3])
+	fmt.Printf("\033[1E")
+	fmt.Printf("\033[32m[MemAvailable]\033[39m:	%s mB",lines[4])
+	fmt.Printf("\033[1E")
+	fmt.Printf("\033[32m[use]\033[39m:		%s mB",lines[5])
+	fmt.Printf("\033[1E")
+	fmt.Printf("\033[36m%s\n",lines[6])
+}
+
 func main() {
+	name, err := os.Hostname()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("\033[37m+----------------------+\n")
 	i := &info.Info{}
 	clear()
 	var total, free, avail int
@@ -49,7 +83,7 @@ func main() {
 		total = i.MemTotal()
 		free =	i.MemFree()
 		avail = i.MemAvailable()
-		title()
+		title(name)
 		fmt.Printf("\033[32m[Uptime]\033[39m%s",i.Uptime())
 		fmt.Printf("\033[1E")
 		fmt.Printf("\033[32m[MemTotal]\033[39m:	%d mB",total/1024)
@@ -61,6 +95,8 @@ func main() {
 		fmt.Printf("\033[32m[use]\033[39m:		%d mB",(total-free)/1024)
 		fmt.Printf("\033[1E")
 		fmt.Printf("\033[36m%s\n",graph(total/1024,free/1024))
+		fmt.Printf("\033[1E")
+		cont()
 		time.Sleep(1000*time.Millisecond)
 		clear()
 	}

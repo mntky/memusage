@@ -45,7 +45,7 @@ func main() {
 		upt = i.Uptime()
 		grph = graph(total,free)
 		sdata := fmt.Sprintf("%s\n%s\n%d\n%d\n%d\n%d\n%s\n", hname,upt,total,free,avail,use,grph)
-		fmt.Println(sdata)
+		//fmt.Println(sdata)
 		f.Write([]byte(sdata))
 		time.Sleep(1000*time.Millisecond)
 	}
