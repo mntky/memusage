@@ -10,6 +10,14 @@ import (
 	"./info"
 )
 
+type datastr struct {
+	Uptime		string
+	Memtotal	string
+	MemFree		string
+	MemAvail	string
+	Use			string
+}
+
 func clear() {
 	cmd := exec.Command("clear")
 	cmd.Stdout = os.Stdout
@@ -45,15 +53,24 @@ func graph(total,free int) string {
 
 func cont() {
 	var lines []string
-	file, err := os.Open("/var/snap/lxd/common/lxd/containers/definite-muskox/rootfs/tmp/info")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
+	var line *bufio.Scanner
+	for {
+		file, err := os.Open("/var/snap/lxd/common/lxd/containers/definite-muskox/rootfs/tmp/info")
+		if err != nil {
+			fmt.Println(err)
+		}
 
-	line := bufio.NewScanner(file)
-	for line.Scan() {
-		lines = append(lines, line.Text())
+		line = bufio.NewScanner(file)
+
+		for line.Scan() {
+			lines = append(lines, line.Text())
+		}
+		if len(lines) == 0 {
+			continue
+		}
+		file.Close()
+		//fmt.Println(len(lines))
+		break
 	}
 	title(lines[0])
 	fmt.Printf("\033[32m[Uptime]\033[39m%s",lines[1])
