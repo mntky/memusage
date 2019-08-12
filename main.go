@@ -57,6 +57,7 @@ func cont() {
 	for {
 		file, err := os.Open("/var/snap/lxd/common/lxd/containers/definite-muskox/rootfs/tmp/info")
 		if err != nil {
+			return
 			fmt.Println(err)
 		}
 
